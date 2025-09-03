@@ -1,0 +1,11 @@
+body {
+    width: 100%;
+    margin: 0;
+    background: lightblue url("fundo.png") no-repeat fixed top;
+
+}
+
+.foto_tigre {
+    width: 55px;
+height: 40px;}
+
