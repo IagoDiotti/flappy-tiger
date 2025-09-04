@@ -1,9 +1,9 @@
-const GAME_SPEED = 1;
+const GAME_SPEED = 0.01;
 const SPACE_BETWEEN_PIPES = 20;
 const PIPE_WIDTH = 50;
 const SCREEN_WIDTH = 600;
 const SCREEN_HEIGHT = 400;
-const PIPE_MOVEMENT = 50;
+const PIPE_MOVEMENT = 4;
 
 const main = document.querySelector("#main");
 main.style.width = `${SCREEN_WIDTH}px`;
@@ -30,7 +30,7 @@ function tickPipeDrop() {
 }
 
 setInterval(tickMovement, GAME_SPEED * 1000);
-setInterval(tickPipeCreation, GAME_SPEED * 5000);
+setInterval(tickPipeCreation, GAME_SPEED * 100000);
 setInterval(tickPipeDrop, GAME_SPEED * 500);
 
 function dropPipes() {
@@ -163,8 +163,8 @@ function draw(what, where) {
 }
 
 const personagem = document.querySelector("#personagem");
-const GRAVITY = 2;
-const JUMP_HEIGHT = 10;
+const GRAVITY = .1;
+const JUMP_HEIGHT = 4;
 let personagemVelocity = 0;
 
 function applyGravity() {
