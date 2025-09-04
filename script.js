@@ -1,6 +1,6 @@
 const GAME_SPEED = 1;
 const SPACE_BETWEEN_PIPES = 20;
-const PIPE_WIDTH = 30;
+const PIPE_WIDTH = 50;
 const SCREEN_WIDTH = 600;
 const SCREEN_HEIGHT = 400;
 const PIPE_MOVEMENT = 50;
@@ -30,7 +30,7 @@ function tickPipeDrop() {
 }
 
 setInterval(tickMovement, GAME_SPEED * 1000);
-setInterval(tickPipeCreation, GAME_SPEED * 3000);
+setInterval(tickPipeCreation, GAME_SPEED * 5000);
 setInterval(tickPipeDrop, GAME_SPEED * 500);
 
 function dropPipes() {
@@ -116,7 +116,7 @@ function setLeft(element, left) {
   element.style.left = `${left}px`;
 }
 
-function moveToDirection({ element, direction = "left", speed = 5 } = {}) {
+function moveToDirection({ element, direction = "left", speed = 1 } = {}) {
   const top = getTop(element);
   const left = getLeft(element);
   switch (direction) {
@@ -161,3 +161,32 @@ function createRectangle({
 function draw(what, where) {
   where.appendChild(what);
 }
+
+const personagem = document.querySelector("#personagem");
+const GRAVITY = 2;
+const JUMP_HEIGHT = 10;
+let personagemVelocity = 0;
+
+function applyGravity() {
+  const currentTop = getTop(personagem);
+  const nextTop = currentTop + personagemVelocity;
+  if (nextTop + personagem.offsetHeight < SCREEN_HEIGHT) {
+    setTop(personagem, nextTop);
+    personagemVelocity += GRAVITY;
+  } else {
+    setTop(personagem, SCREEN_HEIGHT - personagem.offsetHeight);
+    personagemVelocity = 0;
+  }
+}
+
+function jump() {
+  personagemVelocity = -JUMP_HEIGHT;
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.code === "Space") {
+    jump();
+  }
+});
+
+setInterval(applyGravity, GAME_SPEED * 50);

@@ -39,3 +39,14 @@ left : 20%;}
     background-color: green;
     margin-top: auto;
 }
+
+.personagem {
+    width: 55px;
+    height: 40px;
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    transform: translateY(-50%);
+    background: url("tigre.png") no-repeat center;
+    background-size: contain;
+}
