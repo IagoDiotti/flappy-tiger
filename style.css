@@ -5,6 +5,7 @@ html, body {
     background: lightblue url("fundo.png") no-repeat fixed top ;
     background-size: cover;
     overflow: hidden;
+    height: 100vh;
 
 }
 
