@@ -1,17 +1,17 @@
 const GAME_SPEED = 0.01;
 const SPACE_BETWEEN_PIPES = 20;
 const PIPE_WIDTH = 50;
-const SCREEN_WIDTH = 600;
-const SCREEN_HEIGHT = 400;
+const SCREEN_WIDTH = window.innerWidth;
+const SCREEN_HEIGHT = window.innerHeight;
 const PIPE_MOVEMENT = 4;
 
 const main = document.querySelector("#main");
-main.style.width = `${SCREEN_WIDTH}px`;
-main.style.height = `${SCREEN_HEIGHT}px`;
-main.style.position = "absolute";
-main.style.backgroundImage = "fundo.png"; // Define a imagem de fundo
-main.style.backgroundSize = "cover"; // Ajusta a imagem para cobrir todo o elemento
-main.style.backgroundRepeat = "no-repeat"; // Evita repetição da imagem
+//main.style.width = `${SCREEN_WIDTH}px`;
+//main.style.height = `${SCREEN_HEIGHT}px`;
+//main.style.position = "absolute";
+//main.style.backgroundImage = "fundo.png"; // Define a imagem de fundo
+//main.style.backgroundSize = "cover"; // Ajusta a imagem para cobrir todo o elemento
+//main.style.backgroundRepeat = "no-repeat"; // Evita repetição da imagem
 
 const pipes = [];
 
@@ -93,19 +93,19 @@ function createPipes(screen) {
 }
 
 function getWidth(element) {
-  return parseFloat(element.style.width);
+  return parseFloat(window.getComputedStyle(element).width);
 }
 
 function getHeight(element) {
-  return parseFloat(element.style.height);
+  return parseFloat(window.getComputedStyle(element).height);
 }
 
 function getTop(element) {
-  return parseFloat(element.style.top);
+  return parseFloat(element.style.top) || 0;
 }
 
 function getLeft(element) {
-  return parseFloat(element.style.left);
+  return parseFloat(element.style.left) || 0;
 }
 
 function setTop(element, top) {
@@ -145,7 +145,7 @@ function createRectangle({
   top = 0,
   left = 0,
   width = 32,
-  height = 64,
+  height = 34,
   backgroundColor = "red",
 } = {}) {
   const rectangle = document.createElement("div");
@@ -163,30 +163,52 @@ function draw(what, where) {
 }
 
 const personagem = document.querySelector("#personagem");
-const GRAVITY = .1;
-const JUMP_HEIGHT = 4;
-let personagemVelocity = 0;
+const GRAVITY = 0.2;
+const JUMP_HEIGHT = 5;
 
-function applyGravity() {
-  const currentTop = getTop(personagem);
-  const nextTop = currentTop + personagemVelocity;
-  if (nextTop + personagem.offsetHeight < SCREEN_HEIGHT) {
-    setTop(personagem, nextTop);
-    personagemVelocity += GRAVITY;
-  } else {
-    setTop(personagem, SCREEN_HEIGHT - personagem.offsetHeight);
-    personagemVelocity = 0;
+
+
+let personagemVelocityY = 0;
+let gameStarted = false;
+
+function resetCharacter() {
+  const PERSONAGEM_INITIAL_TOP = SCREEN_HEIGHT / 2 - getHeight(personagem) / 2;
+  gameStarted = false;
+  personagemVelocityY = 0;
+  setTop(personagem, PERSONAGEM_INITIAL_TOP);
+}
+
+function gameLoop() {
+  if (gameStarted) {
+    personagemVelocityY += GRAVITY;
+    let newTop = getTop(personagem) + personagemVelocityY;
+
+    const personagemHeight = getHeight(personagem);
+
+    // Impede de passar do topo
+    if (newTop < 0) {
+      newTop = 0;
+      personagemVelocityY = 0; // Zera a velocidade para não "grudar" no teto
+    }
+
+    setTop(personagem, newTop);
+
+    // Reseta se passar do chão
+    if (newTop + personagemHeight > SCREEN_HEIGHT) {
+      resetCharacter();
+    }
   }
+  requestAnimationFrame(gameLoop);
 }
 
-function jump() {
-  personagemVelocity = -JUMP_HEIGHT;
-}
-
-document.addEventListener("keydown", (event) => {
+window.addEventListener("keydown", (event) => {
   if (event.code === "Space") {
-    jump();
+    if (!gameStarted) {
+      gameStarted = true;
+    }
+    personagemVelocityY = -JUMP_HEIGHT;
   }
 });
 
-setInterval(applyGravity, GAME_SPEED * 50);
+resetCharacter();
+gameLoop();   
