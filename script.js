@@ -15,7 +15,7 @@ const main = document.querySelector("#main");
 
 const pipes = [];
 
-createPipes(main);
+
 
 function tickMovement() {
   movePipes();
@@ -28,10 +28,8 @@ function tickPipeCreation() {
 function tickPipeDrop() {
   dropPipes();
 }
-
-setInterval(tickMovement, GAME_SPEED * 1000);
-setInterval(tickPipeCreation, GAME_SPEED * 100000);
-setInterval(tickPipeDrop, GAME_SPEED * 500);
+let lastPipeTime = 0;
+const PIPE_INTERVAL = 2000; // Intervalo para criar canos (em milissegundos)
 
 function dropPipes() {
   pipes.forEach((pipe, index) => {
@@ -176,28 +174,43 @@ function resetCharacter() {
   gameStarted = false;
   personagemVelocityY = 0;
   setTop(personagem, PERSONAGEM_INITIAL_TOP);
+   // Para cada cano no array, remove o elemento da tela
+   pipes.forEach(pipe => pipe.remove());
+   // Esvazia o array para começar do zero na próxima partida
+   pipes.length = 0;
 }
 
-function gameLoop() {
+function gameLoop(currentTime) {
+  // Toda a lógica do jogo só roda se gameStarted for true
   if (gameStarted) {
+    // 1. LÓGICA DO PERSONAGEM (seu código original, já está correto)
     personagemVelocityY += GRAVITY;
     let newTop = getTop(personagem) + personagemVelocityY;
-
     const personagemHeight = getHeight(personagem);
 
-    // Impede de passar do topo
     if (newTop < 0) {
       newTop = 0;
-      personagemVelocityY = 0; // Zera a velocidade para não "grudar" no teto
+      personagemVelocityY = 0;
     }
-
     setTop(personagem, newTop);
-
-    // Reseta se passar do chão
+    
+    // Verifica colisão com o chão
     if (newTop + personagemHeight > SCREEN_HEIGHT) {
       resetCharacter();
     }
+
+    // 2. LÓGICA DOS CANOS (agora dentro do if)
+    movePipes();
+    dropPipes();
+
+    // Cria um novo par de canos a cada PIPE_INTERVAL
+    if (currentTime - lastPipeTime > PIPE_INTERVAL) {
+      lastPipeTime = currentTime;
+      createPipes(main);
+    }
   }
+
+  // Pede ao navegador para chamar gameLoop novamente no próximo quadro
   requestAnimationFrame(gameLoop);
 }
 
