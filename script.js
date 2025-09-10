@@ -17,6 +17,19 @@ const pipes = [];
 
 createPipes(main);
 
+
+/*
+function scoreTimer(){
+  while (true){
+      setTimeout(() => {  
+        document.getElementById('score').textContent += '1';
+      }, (1000)); // 1000 milissegundos = 1 segundos
+
+  }
+}
+*/
+
+
 function tickMovement() {
   movePipes();
 }
@@ -186,6 +199,7 @@ function jump() {
 document.addEventListener("keydown", (event) => {
   if (event.code === "Space") {
     jump();
+    
   }
 });
 
