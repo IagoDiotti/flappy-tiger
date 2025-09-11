@@ -36,13 +36,19 @@ let lastPipeTime = 0;
 const PIPE_INTERVAL = 2000; // Intervalo para criar canos (em milissegundos)
 
 function dropPipes() {
-  pipes.forEach((pipe, index) => {
-    const left = getLeft(pipe);
+  // Usando um loop 'for' de trás para frente para remover com segurança
+  for (let i = pipes.length - 1; i >= 0; i--) {
+    const pipePair = pipes[i];
+    const left = getLeft(pipePair.top); // Pegamos a posição de um dos canos
+
     if (left < -PIPE_WIDTH) {
-      pipe.remove();
-      pipes.splice(index, 1);
+      // Removemos os dois elementos da tela
+      pipePair.top.remove();
+      pipePair.bottom.remove();
+      // Removemos o objeto do array
+      pipes.splice(i, 1);
     }
-  });
+  }
 }
 
 function movePipe(pipe) {
@@ -52,45 +58,111 @@ function movePipe(pipe) {
 }
 
 function movePipes() {
-  pipes.forEach((pipe) => {
-    movePipe(pipe);
+  // Agora 'pipePair' é o objeto {top: ..., bottom: ...}
+  pipes.forEach((pipePair) => {
+    // Temos que mover CADA cano dentro do par
+    movePipe(pipePair.top);
+    movePipe(pipePair.bottom);
   });
 }
 
 function createPipes(screen) {
-  const screenWidth = getWidth(screen);
-  const screenHeight = document.body.clientHeight; // Usa a altura do body;
+  const screenHeight = SCREEN_HEIGHT; // Use SCREEN_HEIGHT dinâmico;
 
-  const topHeightProportion = parseInt(Math.random() * 60);
+  const minGapTop = 15; // Proporção mínima do topo (ex: 15%)
+  const maxGapTop = 65; // Proporção máxima do topo (ex: 65%)
+  
+  // Garante que o espaço aleatório para o topo seja razoável
+  const topHeightProportion = parseInt(Math.random() * (maxGapTop - minGapTop) + minGapTop);
+  
+  // A folga entre os canos agora é fixa, mas pode ser dinâmica também
+  const gapProportion = SPACE_BETWEEN_PIPES; 
+
   const bottomHeightProportion =
-    100 - topHeightProportion - SPACE_BETWEEN_PIPES;
+    100 - topHeightProportion - gapProportion;
 
   const topHeight = screenHeight * (topHeightProportion / 100);
   const bottomHeight = screenHeight * (bottomHeightProportion / 100);
 
-  console.log(document.body.clientHeight);
-
+  // Crie o cano superior
   const topPipe = createRectangle({
     width: PIPE_WIDTH,
     height: topHeight,
-    backgroundColor: "green",
     top: 0,
     left: window.innerWidth, // Posiciona o pipe fora da tela, no lado direito do body
     zIndex: 10,
     border: "2px solid red",
+    left: SCREEN_WIDTH, // Use SCREEN_WIDTH
   });
+
+  // Crie a "tampa" do cano superior
+  const topPipeCap = createRectangle({
+    width: 73, // Largura maior para a tampa
+    height: 35, // Altura da tampa
+    top: topHeight - 30, // Posiciona a tampa na extremidade inferior do cano
+    left: -10, // Ajusta para centralizar na largura do cano principal
+    className: "pipe-cap" // Adiciona a classe da tampa
+  });
+  topPipe.appendChild(topPipeCap); // Anexa a tampa ao cano superior
+
+  // Crie o cano inferior
   const bottomPipe = createRectangle({
     width: PIPE_WIDTH,
     height: bottomHeight,
-    backgroundColor: "green",
     top: screenHeight - bottomHeight,
-    left: window.innerWidth, // Posiciona o pipe fora da tela, no lado direito do body
-    zIndex: 10,
+    left: SCREEN_WIDTH, // Use SCREEN_WIDTH
   });
-  pipes.push(topPipe, bottomPipe);
+
+  // Crie a "tampa" do cano inferior
+  const bottomPipeCap = createRectangle({
+    width: 73, // Largura maior para a tampa
+    height: 35, // Altura da tampa
+    top: -3, // Posiciona a tampa na extremidade superior do cano
+    left: -10, // Ajusta para centralizar
+    className: "pipe-cap" // Adiciona a classe da tampa
+  });
+  bottomPipe.appendChild(bottomPipeCap); // Anexa a tampa ao cano inferior
+  
+  // Modificação: Adicione um objeto que contém ambos os canos e a propriedade `scored`
+  pipes.push({
+      top: topPipe,
+      bottom: bottomPipe,
+      scored: false // Para o sistema de pontuação
+  });
 
   draw(topPipe, screen);
   draw(bottomPipe, screen);
+}
+class InvalidDirectionError extends Error {}
+
+function createRectangle({
+  top = 0,
+  left = 0,
+  width = 32,
+  height = 34,
+  className = "" // Novo parâmetro para adicionar classes extras
+} = {}) {
+  const rectangle = document.createElement("div");
+  rectangle.classList.add("pipe"); // Todos os canos têm a classe base "pipe"
+  
+  if (className) { // Se uma classe extra for fornecida, adicione-a
+    rectangle.classList.add(className);
+  }
+
+  rectangle.style.top = `${top}px`;
+  rectangle.style.left = `${left}px`;
+  rectangle.style.width = `${width}px`;
+  rectangle.style.height = `${height}px`;
+
+  
+  rectangle.style.position = "absolute"; // Já está no CSS, mas não custa garantir. Z-index também pode ir para o CSS
+  rectangle.style.zIndex = 10; // Z-index para garantir que canos fiquem sobre outros elementos (ajustar se necessário)
+  
+  return rectangle;
+}
+
+function draw(what, where) {
+  where.appendChild(what);
 }
 
 function getWidth(element) {
@@ -115,52 +187,6 @@ function setTop(element, top) {
 
 function setLeft(element, left) {
   element.style.left = `${left}px`;
-}
-
-function moveToDirection({ element, direction = "left", speed = 1 } = {}) {
-  const top = getTop(element);
-  const left = getLeft(element);
-  switch (direction) {
-    case "top":
-      setTop(element, top - speed);
-      break;
-    case "left":
-      setLeft(element, left + speed);
-      break;
-    case "right":
-      setLeft(element, left - speed);
-      break;
-    case "bottom":
-      setTop(element, top + speed);
-      break;
-    default:
-      throw new InvalidDirectionError(
-        `The direction "${direction}" is invalid!`
-      );
-  }
-}
-
-class InvalidDirectionError extends Error {}
-
-function createRectangle({
-  top = 0,
-  left = 0,
-  width = 32,
-  height = 34,
-  backgroundColor = "red",
-} = {}) {
-  const rectangle = document.createElement("div");
-  rectangle.style.top = `${top}px`;
-  rectangle.style.left = `${left}px`;
-  rectangle.style.width = `${width}px`;
-  rectangle.style.height = `${height}px`;
-  rectangle.style.backgroundColor = backgroundColor;
-  rectangle.style.position = "absolute";
-  return rectangle;
-}
-
-function draw(what, where) {
-  where.appendChild(what);
 }
 
 const personagem = document.querySelector("#personagem");
@@ -217,6 +243,14 @@ function detectCollision() {
       resetCharacter();
     }
   }
+  
+  // Lógica correta para remover os canos
+  pipes.forEach(pipePair => {
+    pipePair.top.remove();
+    pipePair.bottom.remove();
+  });
+  
+  pipes.length = 0;
 }
 
 function gameLoop(currentTime) {

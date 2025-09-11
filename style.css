@@ -63,10 +63,44 @@ body {
 }
 
 .personagem {
-  width: 55px;
-  height: 40px;
-  position: absolute;
-  left: 100px;
-  background: url("tigre.png") no-repeat center;
-  background-size: contain;
+    width: 55px;
+    height: 40px;
+    position: absolute;
+    left: 100px;
+    background: url("tigre.png") no-repeat center;
+    background-size: contain;
+}
+
+/* Seu CSS existente para html, body, #main, .personagem... */
+
+.pipe {
+    position: absolute;
+    background-color: #74BF2E; /* Cor verde vibrante dos canos do Flappy Bird */
+    border: 3px solid #578D24; /* Borda mais escura para profundidade */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* Sombra para dar volume */
+    width: 40px; /* Largura fixa, como você definiu */
+    /* A altura (height), topo (top) e esquerda (left) serão controlados pelo JavaScript */
+    /* Propriedades para arredondar a parte superior/inferior se quiser */
+    /* border-radius: 5px; */ 
+}
+
+/* Estilo para a "borda" superior/inferior do cano */
+.pipe-cap {
+    position: absolute;
+    /* Ajuste de largura para ficar mais sutil */
+    width: 10px; /* << MUDANÇA: Um pouco maior que o cano de 50px */
+    
+    /* Ajuste de altura para ficar menos comprida */
+    height: 10px; /* << MUDANÇA: Diminuímos de 30px */
+
+    /* Novo cálculo para centralizar: (50px do cano - 60px da tampa) / 2 = -5px */
+    left: -5px; /* << MUDANÇA: Corrigido para centralizar com o cano de 50px */
+
+    background-color: #578D24; 
+    border: 3px solid #3A5C18; 
+    z-index: 1; 
+    border-radius: 5px; 
+    
+    /* Dica extra: Adicionar isso pode evitar problemas de cálculo com bordas */
+    box-sizing: border-box; 
 }
