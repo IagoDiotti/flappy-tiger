@@ -1,66 +1,72 @@
-html, body {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    background: lightblue url("fundo.png") no-repeat fixed top ;
-    background-size: cover;
-    overflow: hidden;
-    height: 100vh;
-
+html,
+body {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: lightblue url("fundo.png") no-repeat fixed top;
+  background-size: cover;
+  overflow: hidden;
+  height: 100vh;
 }
-#score{
-    position: absolute;
-    bottom: 85%;
-    right: 50%;
+#score {
+  position: absolute;
+  bottom: 85%;
+  right: 50%;
+  color: #f48022;
+  font-size: 30px;
+  font-family: "Arial", sans-serif;
+  z-index: 9999;
 }
 .foto_tigre {
-    width: 55px;
-height: 40px;
-position: absolute;
-top: 50%;
-left : 20%;}
-
-.obstaculo {
-    width: 80px;
-    height: 100vh; 
-    position: absolute;
-    right: 35%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+  width: 55px;
+  height: 40px;
+  position: absolute;
+  top: 50%;
+  left: 20%;
 }
 
+.obstaculo {
+  width: 80px;
+  height: 100vh;
+  position: absolute;
+  right: 35%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 
 .superior {
-    width: 100%;
-    height: 40%;
-    background-color: green;
+  width: 100%;
+  height: 40%;
+  background-color: green;
 }
 
 .inferior {
-    width: 100%;
-    height: 40%;
-    background-color: green;
-    margin-top: auto;
+  width: 100%;
+  height: 40%;
+  background-color: green;
+  margin-top: auto;
 }
 
 #main {
-    width: 100%; /* Adicione a largura */
-    height: 100%; /* Adicione a altura */
-    position: relative; /* Necessário para que o personagem fique dentro dele */
-    margin: auto; /* Centraliza horizontalmente */
-    top: 50%; /* Move o topo do #main para o meio da tela */
-    transform: translateY(-50%); /* Puxa o #main para cima pela metade de sua altura para centralizar verticalmente */
-    overflow: hidden; /* Garante que os canos não apareçam fora da área de jogo */
-    background: url("fundo.png") no-repeat center;
-    background-size: cover;
+  width: 100%; /* Adicione a largura */
+  height: 100%; /* Adicione a altura */
+  position: relative; /* Necessário para que o personagem fique dentro dele */
+  margin: auto; /* Centraliza horizontalmente */
+  top: 50%; /* Move o topo do #main para o meio da tela */
+  transform: translateY(
+    -50%
+  ); /* Puxa o #main para cima pela metade de sua altura para centralizar verticalmente */
+  overflow: hidden; /* Garante que os canos não apareçam fora da área de jogo */
+  background: url("fundo.png") no-repeat center;
+  background-size: cover;
 }
 
 .personagem {
-    width: 55px;
-    height: 40px;
-    position: absolute;
-    left: 10%;
-    background: url("tigre.png") no-repeat center;
-    background-size: contain;
+  width: 55px;
+  height: 40px;
+  position: absolute;
+  left: 100px;
+  background: url("tigre.png") no-repeat center;
+  background-size: contain;
 }

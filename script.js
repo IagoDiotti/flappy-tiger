@@ -15,32 +15,23 @@ const main = document.querySelector("#main");
 
 const pipes = [];
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
-
-
-/*
-function scoreTimer(){
-  while (true){
-      setTimeout(() => {  
-        document.getElementById('score').textContent += '1';
-      }, (1000)); // 1000 milissegundos = 1 segundos
-
+async function scoreTimer() {
+  while (true) {
+    await sleep(1000);
+    if (gameStarted) {
+      let score = Number(document.getElementById("score").textContent);
+      document.getElementById("score").textContent = ++score;
+    } else {
+      document.getElementById("score").textContent = 0;
+    }
   }
 }
-*/
+scoreTimer();
 
-
-function tickMovement() {
-  movePipes();
-}
-
-function tickPipeCreation() {
-  createPipes(main);
-}
-
-function tickPipeDrop() {
-  dropPipes();
-}
 let lastPipeTime = 0;
 const PIPE_INTERVAL = 2000; // Intervalo para criar canos (em milissegundos)
 
@@ -86,8 +77,7 @@ function createPipes(screen) {
     top: 0,
     left: window.innerWidth, // Posiciona o pipe fora da tela, no lado direito do body
     zIndex: 10,
-    border: "2px solid red", 
-    
+    border: "2px solid red",
   });
   const bottomPipe = createRectangle({
     width: PIPE_WIDTH,
@@ -177,20 +167,56 @@ const personagem = document.querySelector("#personagem");
 const GRAVITY = 0.2;
 const JUMP_HEIGHT = 5;
 
-
-
 let personagemVelocityY = 0;
 let gameStarted = false;
+let isPerdelMane = false;
 
 function resetCharacter() {
+  isPerdelMane = false;
   const PERSONAGEM_INITIAL_TOP = SCREEN_HEIGHT / 2 - getHeight(personagem) / 2;
   gameStarted = false;
   personagemVelocityY = 0;
   setTop(personagem, PERSONAGEM_INITIAL_TOP);
-   // Para cada cano no array, remove o elemento da tela
-   pipes.forEach(pipe => pipe.remove());
-   // Esvazia o array para começar do zero na próxima partida
-   pipes.length = 0;
+  // Para cada cano no array, remove o elemento da tela
+  pipes.forEach((pipe) => pipe.remove());
+  // Esvazia o array para começar do zero na próxima partida
+  pipes.length = 0;
+}
+
+function detectCollision() {
+  if (isPerdelMane) {
+    return;
+  }
+
+  const personagem = document.querySelector("#personagem");
+  const personagemTop = parseFloat(personagem.style.top);
+  const personagemBottom = window.innerHeight - personagemTop + 40;
+  let detectedPipes = [];
+
+  pipes.forEach((pipe) => {
+    let left = parseFloat(pipe.style.left);
+    if (left >= 100 && left <= 155) {
+      console.log("ó o gás");
+      detectedPipes.push(pipe);
+    }
+  });
+
+  if (detectedPipes.length > 0) {
+    const [topPipe, bottomPipe] = detectedPipes;
+    const topPipeBottom = parseFloat(topPipe.style.height);
+    const bottomPipeTop = parseFloat(bottomPipe.style.height);
+    console.log(
+      `topPipeBottom=${topPipeBottom}, bottomPipeTop=${bottomPipeTop}`
+    );
+    console.log(
+      `personagemTop=${personagemTop} personagemBottom=${personagemBottom}`
+    );
+    if (!(bottomPipeTop < personagemBottom && topPipeBottom < personagemTop)) {
+      alert("perdel mané");
+      isPerdelMane = true;
+      resetCharacter();
+    }
+  }
 }
 
 function gameLoop(currentTime) {
@@ -206,11 +232,13 @@ function gameLoop(currentTime) {
       personagemVelocityY = 0;
     }
     setTop(personagem, newTop);
-    
+
     // Verifica colisão com o chão
     if (newTop + personagemHeight > SCREEN_HEIGHT) {
       resetCharacter();
     }
+
+    detectCollision();
 
     // 2. LÓGICA DOS CANOS (agora dentro do if)
     movePipes();
@@ -237,4 +265,4 @@ window.addEventListener("keydown", (event) => {
 });
 
 resetCharacter();
-gameLoop();   
+gameLoop();
